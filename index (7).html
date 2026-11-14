@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тренажёр по статьям УК РФ</title>
+<style>
+:root{
+  --paper:#f7f4ec; --paper2:#efeadd; --card:#fffdf7;
+  --ink:#23262e; --mut:#837d6e; --line:#e2dbcb; --line2:#d4cbb6;
+  --acc:#7d2a33; --acc-soft:#f3e6e0; --gold:#8a6d2a;
+  --ok:#2e6b46; --ok-soft:#e7f1e7; --bad:#a83232; --bad-soft:#f9e8e6;
+  --shadow:0 1px 2px rgba(60,50,30,.05), 0 6px 18px rgba(60,50,30,.06);
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype","Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); line-height:1.55;
+  background:linear-gradient(180deg,#faf8f1 0%, var(--paper) 40%, #f3efe4 100%);
+  min-height:100vh;
+}
+::selection{background:var(--acc-soft)}
+button{font-family:inherit}
+.wrap{max-width:960px; margin:0 auto; padding:0 18px 48px}
+
+/* ── шапка ── */
+.topnav{
+  position:sticky; top:0; z-index:20; background:rgba(250,248,241,.92);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.topnav .in{max-width:960px; margin:0 auto; padding:10px 18px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.brand{font-family:var(--serif); font-size:17px; letter-spacing:.2px; white-space:nowrap}
+.brand b{color:var(--acc); font-weight:700}
+.brand .sep{color:var(--line2); margin:0 8px}
+.tabs{display:flex; gap:2px; flex-wrap:wrap}
+.tabs button{
+  background:none; border:none; color:var(--mut); cursor:pointer;
+  font-size:14.5px; font-weight:600; padding:9px 13px; border-radius:10px;
+  border-bottom:2px solid transparent; transition:.15s;
+}
+.tabs button:hover{color:var(--ink); background:#fff8}
+.tabs button.active{color:var(--acc); background:var(--acc-soft); border-bottom-color:var(--acc)}
+.brand svg, .tabs button svg{fill:none; stroke:currentColor; stroke-width:1.8;
+  stroke-linecap:round; stroke-linejoin:round}
+.brand svg{width:21px; height:21px; color:var(--acc); margin-right:8px; vertical-align:-5px}
+.tabs button svg{width:16px; height:16px; margin-right:6px; vertical-align:-2.5px}
+
+/* ── герои-блок ── */
+header.hero{text-align:center; padding:44px 10px 30px}
+.rule{max-width:520px; margin:0 auto; border-top:1px solid var(--line2); position:relative}
+.rule+.rule{margin-top:6px}
+.kicker{
+  font-size:11.5px; letter-spacing:3px; text-transform:uppercase; color:var(--gold);
+  font-weight:700; margin:16px 0 14px;
+}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(30px,5.6vw,46px);
+  letter-spacing:.2px; line-height:1.15; margin-bottom:16px}
+.hero h1 .u{color:var(--acc)}
+
+/* ── секции ── */
+section{display:none}
+section.active{display:block; animation:fade .3s ease}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+
+.chips{display:flex; flex-wrap:wrap; gap:7px; margin:14px 0}
+.chip{
+  background:transparent; border:1px solid var(--line2); color:var(--mut);
+  border-radius:999px; padding:6px 14px; font-size:13px; cursor:pointer; transition:.15s;
+}
+.chip:hover{color:var(--ink); border-color:var(--ink)}
+.chip.active{background:var(--ink); border-color:var(--ink); color:var(--paper); font-weight:600}
+.chip small{opacity:.6; font-weight:400}
+.search{
+  width:100%; background:var(--card); border:1px solid var(--line2); color:var(--ink);
+  border-radius:12px; padding:13px 18px; font-size:15px; outline:none; margin-top:6px;
+  box-shadow:var(--shadow); transition:.15s;
+}
+.search::placeholder{color:#a9a294}
+.search:focus{border-color:var(--acc)}
+.hint{color:var(--mut); font-size:12.5px; margin:10px 2px 14px}
+
+/* ── карточки статей ── */
+.acards{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media(max-width:640px){.acards{grid-template-columns:1fr}}
+.acard{
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:16px 18px 14px; position:relative; transition:.18s; box-shadow:var(--shadow);
+}
+.acard:hover{border-color:var(--line2); transform:translateY(-2px); box-shadow:0 3px 6px rgba(60,50,30,.07),0 10px 24px rgba(60,50,30,.09)}
+.acard .top{display:flex; align-items:baseline; gap:10px; margin-bottom:7px}
+.num{font-family:var(--serif); color:var(--acc); font-weight:700; font-size:17px; white-space:nowrap}
+.acard h3{font-family:var(--serif); font-size:16.5px; line-height:1.3; font-weight:700; padding-right:26px}
+.acard .pun{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line)}
+.pun-label{display:block; font-size:10px; letter-spacing:1.8px; text-transform:uppercase;
+  color:var(--gold); font-weight:700; margin-bottom:3px}
+.acard .pun, .face .pun{font-size:13.5px; color:#5d5648}
+.acard .cat{display:inline-block; font-size:11px; color:var(--mut); margin-top:10px;
+  border:1px solid var(--line); border-radius:999px; padding:2.5px 11px}
+.star{
+  position:absolute; top:13px; right:13px; background:none; border:none; cursor:pointer;
+  font-size:18px; color:#cdc5b2; transition:.15s; line-height:1; padding:2px;
+}
+.star:hover{transform:scale(1.25); color:var(--gold)}
+.star.on{color:var(--gold)}
+.empty{color:var(--mut); text-align:center; padding:40px 0; font-family:var(--serif); font-style:italic}
+
+/* ── флеш-карточки ── */
+.fcwrap{max-width:470px; margin:22px auto 0; text-align:center}
+.fc{perspective:1400px; height:300px}
+.fc-inner{position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.1,.2,1); transform-style:preserve-3d}
+.fc.flipped .fc-inner{transform:rotateY(180deg)}
+.face{
+  position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--card); border:1px solid var(--line2); outline:1px solid var(--line); outline-offset:5px;
+  border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:26px; gap:13px; box-shadow:var(--shadow);
+}
+.face.back{transform:rotateY(180deg)}
+.face .bignum{font-family:var(--serif); font-size:64px; font-weight:700; color:var(--acc); line-height:1}
+.face .small{color:var(--mut); font-size:11px; letter-spacing:2.4px; text-transform:uppercase}
+.face h3{font-family:var(--serif); font-size:20px; line-height:1.3}
+.face .pun{margin-top:2px}
+.face .cat{font-size:11px; color:var(--mut); border:1px solid var(--line); border-radius:999px; padding:2.5px 11px}
+.fbtns{display:flex; gap:10px; justify-content:center; margin-top:18px}
+.btn{
+  border:none; border-radius:11px; padding:12px 24px; font-size:14.5px; font-weight:600;
+  cursor:pointer; transition:.15s; color:var(--paper); background:var(--ink);
+  letter-spacing:.2px;
+}
+.btn:hover{filter:brightness(1.25)}
+.btn.ghost{background:var(--card); border:1px solid var(--line2); color:var(--ink)}
+.btn.ok{background:var(--ok)}
+.btn:disabled{opacity:.4; cursor:default}
+.prog{color:var(--mut); font-size:13px; margin-top:16px}
+.bar{height:7px; background:var(--paper2); border-radius:6px; overflow:hidden; margin-top:7px}
+.bar i{display:block; height:100%; background:var(--acc); border-radius:6px; transition:width .3s}
+
+/* ── тест ── */
+.qbox{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:24px 26px; max-width:620px; margin:22px auto 0; box-shadow:var(--shadow);
+}
+.qbox .qt{font-size:12px; letter-spacing:1.8px; text-transform:uppercase; color:var(--gold);
+  font-weight:700; margin:14px 0 8px}
+.qbox h2{font-family:var(--serif); font-size:20px; margin-bottom:16px; line-height:1.35}
+.qmeta{display:flex; justify-content:space-between; color:var(--mut); font-size:13px; margin-bottom:10px}
+.opt{
+  display:block; width:100%; text-align:left; background:transparent; color:var(--ink);
+  border:1px solid var(--line2); border-radius:11px; padding:12.5px 16px; font-size:14.5px;
+  margin-bottom:9px; cursor:pointer; transition:.15s;
+}
+.opt:hover:not(:disabled){border-color:var(--ink); background:#fff}
+.opt.correct{background:var(--ok-soft); border-color:var(--ok); color:#1d4d33; font-weight:600}
+.opt.wrong{background:var(--bad-soft); border-color:var(--bad); color:#7a2222}
+.opt:disabled{cursor:default}
+.result{text-align:center; padding:34px 10px}
+.result .big{font-family:var(--serif); font-size:56px; font-weight:700; color:var(--acc)}
+.result .bigicon{width:54px; height:54px; color:var(--ok); fill:none; stroke:currentColor;
+  stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.result p{color:var(--mut); margin:10px 0 18px; font-family:var(--serif); font-style:italic; font-size:16px}
+.mist{text-align:left; background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:18px 22px; margin-top:14px; box-shadow:var(--shadow)}
+.mist ul{list-style:none}
+.mist li{margin:12px 0; font-size:14px; padding-bottom:12px; border-bottom:1px dashed var(--line)}
+.mist li:last-child{border-bottom:none; margin-bottom:0}
+.mist b{color:var(--acc); font-family:var(--serif)}
+.center{text-align:center}
+
+/* ── статистика ── */
+.sgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin:18px 0}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 16px;
+  text-align:center; box-shadow:var(--shadow)}
+.stat .v{font-family:var(--serif); font-size:32px; font-weight:700; color:var(--acc)}
+.stat .l{color:var(--mut); font-size:12.5px; margin-top:5px}
+.prow{display:flex; align-items:center; gap:12px; margin:9px 0; font-size:13px}
+.prow .name{width:200px; color:#5d5648; flex-shrink:0; font-weight:600}
+.prow .bar{flex:1; margin:0}
+.prow .pc{width:48px; text-align:right; color:var(--mut); font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="in">
+    <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="1.5"/><path d="M12 6v14"/><path d="M8.5 20h7"/><path d="M5 7h14"/><path d="M5 7l-3 6"/><path d="M5 7l3 6"/><path d="M2 13a3 3 0 0 0 6 0"/><path d="M19 7l-3 6"/><path d="M19 7l3 6"/><path d="M16 13a3 3 0 0 0 6 0"/></svg><b>УК&nbsp;РФ</b><span class="sep">·</span>Тренажёр</div>
+    <div class="tabs">
+      <button data-tab="learn" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v18H7.5A2.5 2.5 0 0 0 5 22V4.5Z"/><path d="M5 19.5A2.5 2.5 0 0 1 7.5 17H19"/></svg>Учить</button>
+      <button data-tab="cards"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="12" height="15" rx="2.5"/><rect x="3.5" y="6.5" width="12" height="15" rx="2.5"/></svg>Карточки</button>
+      <button data-tab="quiz"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.3 2.3 4.9-5"/></svg>Тест</button>
+      <button data-tab="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M6.5 20.5v-6"/><path d="M12 20.5v-11"/><path d="M17.5 20.5v-8"/></svg>Статистика</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="rule"></div>
+    <div class="kicker">Уголовный кодекс Российской Федерации</div>
+    <h1>Тренажёр по статьям <span class="u">УК&nbsp;РФ</span></h1>
+    <div class="rule"></div>
+  </header>
+
+  <section id="tab-learn" class="active">
+    <input class="search" id="search" type="search" placeholder="Поиск: номер (105) или название (убийство)…">
+    <div class="chips" id="chipsLearn"></div>
+    <p class="hint" id="learnCount"></p>
+    <div class="acards" id="alist"></div>
+  </section>
+
+  <section id="tab-cards">
+    <div class="chips" id="chipsCards"></div>
+    <div class="fcwrap" id="fcwrap"></div>
+  </section>
+
+  <section id="tab-quiz">
+    <div id="quizArea"></div>
+  </section>
+
+  <section id="tab-stats">
+    <div id="statsArea"></div>
+  </section>
+</div>
+<script>
+"use strict";
+// [номер, название, категория, наказание (кратко)]
+const DATA = [
+["105","Убийство","Личность","ч.1 — лишение свободы от 6 до 15 лет; ч.2 (отягчающие) — от 8 до 20 лет или пожизненное"],
+["106","Убийство матерью новорождённого ребёнка","Личность","лишение свободы до 5 лет"],
+["107","Убийство в состоянии аффекта","Личность","ч.1 — до 3 лет; ч.2 — до 5 лет"],
+["108","Убийство при превышении пределов необходимой обороны","Личность","ч.1 — до 2 лет; ч.2 — до 3 лет"],
+["109","Причинение смерти по неосторожности","Личность","ч.1 — до 2 лет; ч.2 — до 4 лет"],
+["110","Доведение до самоубийства","Личность","ч.1 — от 2 до 6 лет; ч.2 — от 8 до 15 лет"],
+["111","Умышленное причинение тяжкого вреда здоровью","Личность","ч.1 — до 8 лет; ч.4 (смерть) — до 15 лет"],
+["112","Умышленное причинение средней тяжести вреда здоровью","Личность","ч.1 — до 3 лет; ч.2 — до 5 лет"],
+["113","Причинение тяжкого вреда здоровью в состоянии аффекта","Личность","ч.1 — до 2 лет"],
+["114","Причинение тяжкого вреда при превышении обороны или мер задержания","Личность","ч.1 — до 1 года; ч.2 — до 2 лет"],
+["115","Умышленное причинение лёгкого вреда здоровью","Личность","ч.1 — штраф, арест до 4 мес.; ч.2 — до 2 лет"],
+["116","Побои","Личность","ч.1 (хулиганские побуждения, ненависть) — до 2 лет"],
+["117","Истязание","Личность","ч.1 — до 3 лет; ч.2 — до 7 лет"],
+["119","Угроза убийством или причинением тяжкого вреда здоровью","Личность","ч.1 — до 2 лет; ч.2 — до 5 лет"],
+["120","Принуждение к изъятию органов или тканей человека","Личность","ч.1 — до 4 лет"],
+["121","Заражение венерической болезнью","Личность","штраф, исправительные работы, арест до 6 мес."],
+["122","Заражение ВИЧ-инфекцией","Личность","ч.1 — до 1 года; ч.2 (заведомо) — до 5 лет"],
+["124","Неоказание помощи больному","Личность","ч.1 — штраф, арест; ч.2 (смерть) — до 4 лет"],
+["125","Оставление в опасности","Личность","до 1 года лишения свободы"],
+["126","Похищение человека","Личность","ч.1 — до 5 лет; ч.2 — до 7 лет; ч.4 (тяжкие) — от 5 до 15 лет"],
+["127","Незаконное лишение свободы","Личность","ч.1 — до 2 лет; ч.2 — до 5 лет"],
+["127.1","Торговля людьми","Личность","ч.1 — до 6 лет; вплоть до 15 лет (ч.3)"],
+["127.2","Использование рабского труда","Личность","ч.1 — до 5 лет; вплоть до 15 лет (ч.3)"],
+["128","Незаконное помещение в психиатрический стационар","Личность","ч.1 — до 3 лет"],
+["131","Изнасилование","Личность","ч.1 — от 3 до 6 лет; вплоть до пожизненного (ч.4)"],
+["132","Насильственные действия сексуального характера","Личность","ч.1 — от 3 до 6 лет; вплоть до пожизненного (ч.4)"],
+["133","Понуждение к действиям сексуального характера","Личность","до 1 года лишения свободы"],
+["134","Половое сношение с лицом, не достигшим 16 лет","Личность","ч.1 — до 4 лет"],
+["135","Развратные действия","Личность","ч.1 — до 3 лет"],
+["136","Нарушение равенства прав и свобод человека и гражданина","Личность","ч.1 — штраф; ч.2 (с насилием) — до 5 лет"],
+["137","Нарушение неприкосновенности частной жизни","Личность","ч.1 — штраф, арест; ч.2 (служебное положение) — до 4 лет"],
+["139","Нарушение неприкосновенности жилища","Личность","ч.1 — штраф, арест; ч.3 (тяжкие) — до 5 лет"],
+["141","Воспрепятствование осуществлению избирательных прав","Личность","ч.1 — штраф; вплоть до 5 лет (ч.3)"],
+["143","Нарушение требований охраны труда","Личность","ч.1 — штраф; ч.2 (смерть) — до 4 лет; ч.3 — до 5 лет"],
+["145","Невыплата заработной платы","Личность","ч.1 — до 1 года; ч.2 — до 3 лет; ч.3 (тяжкие) — от 2 до 5 лет"],
+["146","Нарушение авторских и смежных прав","Личность","ч.1 — штраф; ч.3 (крупный ущерб) — до 6 лет"],
+["150","Вовлечение несовершеннолетнего в совершение преступления","Личность","ч.1 — до 5 лет; ч.3 (тяжкое преступление) — до 8 лет"],
+["151","Вовлечение несовершеннолетнего в антиобщественные действия","Личность","ч.1 — до 4 лет"],
+["153","Подмена ребёнка","Личность","до 5 лет лишения свободы"],
+["155","Разглашение тайны усыновления (удочерения)","Личность","штраф, исправительные работы, арест до 4 мес."],
+["156","Неисполнение обязанностей по воспитанию несовершеннолетнего","Личность","до 3 лет (с жестоким обращением)"],
+["157","Неуплата средств на содержание детей (алиментов)","Личность","ч.1 — до 1 года"],
+["158","Кража","Собственность","ч.1 — до 2 лет; ч.4 — до 10 лет"],
+["159","Мошенничество","Собственность","ч.1 — до 2 лет; ч.7 — до 10 лет"],
+["160","Присвоение или растрата","Собственность","ч.1 — до 2 лет; ч.4 — до 10 лет"],
+["161","Грабёж","Собственность","ч.1 — до 4 лет; ч.3 — от 5 до 12 лет"],
+["162","Разбой","Собственность","ч.1 — до 8 лет; ч.4 — от 8 до 15 лет"],
+["163","Вымогательство","Собственность","ч.1 — до 4 лет; ч.3 — от 5 до 15 лет"],
+["164","Хищение предметов, имеющих особую ценность","Собственность","ч.2 (группа, особо крупный) — до 15 лет"],
+["165","Причинение имущественного ущерба путём обмана","Собственность","ч.1 — до 2 лет; ч.2 — до 5 лет"],
+["166","Неправомерное завладение автомобилем (угон)","Собственность","ч.1 — штраф до 120 тыс. руб.; ч.4 (с насилием) — от 5 до 12 лет"],
+["167","Умышленное уничтожение или повреждение имущества","Собственность","ч.1 — до 2 лет; ч.2 (поджог, смерть) — до 5 лет"],
+["168","Уничтожение имущества по неосторожности","Собственность","ч.1 — до 3 лет"],
+["171","Незаконное предпринимательство","Экономика","ч.1 — штраф, арест; ч.2 (крупный доход) — до 5 лет"],
+["172","Незаконная банковская деятельность","Экономика","ч.1 — до 4 лет; ч.2 — до 7 лет"],
+["174","Легализация (отмывание) денежных средств","Экономика","ч.1 — до 2 лет; ч.4 — до 7 лет"],
+["175","Приобретение или сбыт имущества, добытого преступным путём","Экономика","ч.1 — штраф; ч.3 (особо крупный) — от 3 до 7 лет"],
+["186","Изготовление и сбыт поддельных денег (фальшивомонетничество)","Экономика","ч.1 — до 8 лет; ч.3 — от 8 до 15 лет"],
+["188","Контрабанда","Экономика","ч.1 — штраф, исправительные работы; ч.4 — от 7 до 12 лет"],
+["198","Уклонение от уплаты налогов физическим лицом","Экономика","ч.1 — штраф; ч.2 (особо крупный) — до 3 лет"],
+["199","Уклонение от уплаты налогов организацией","Экономика","ч.1 — штраф; ч.2 (особо крупный) — до 6 лет"],
+["201","Злоупотребление полномочиями","Экономика","ч.1 — до 4 лет; ч.3 (тяжкие) — вплоть до 10 лет"],
+["202","Злоупотребление полномочиями частными нотариусами и аудиторами","Экономика","до 3 лет лишения свободы"],
+["203","Превышение полномочий частными детективами или охранниками","Экономика","ч.1 — до 3 лет"],
+["204","Коммерческий подкуп","Экономика","ч.1 — до 2 лет; ч.8 (особо крупный) — от 8 до 15 лет"]
+];
+const DATA2 = [
+["205","Террористический акт","Безопасность","ч.1 — от 10 до 15 лет; вплоть до пожизненного (ч.3)"],
+["205.1","Содействие террористической деятельности","Безопасность","вплоть до 20 лет лишения свободы"],
+["205.2","Публичные призывы к террористической деятельности","Безопасность","ч.1 — до 5 лет; ч.2 (СМИ, интернет) — от 5 до 10 лет"],
+["205.3","Прохождение обучения в целях террористической деятельности","Безопасность","от 15 до 20 лет"],
+["205.4","Организация террористического сообщества","Безопасность","ч.1 — от 15 до 20 лет"],
+["205.5","Организация деятельности террористической организации","Безопасность","ч.1 — от 15 до 20 лет"],
+["205.6","Несообщение о преступлении (терроризм)","Безопасность","штраф; до 1 года"],
+["206","Захват заложника","Безопасность","ч.1 — от 5 до 10 лет; вплоть до пожизненного (ч.4)"],
+["207","Заведомо ложное сообщение об акте терроризма","Безопасность","ч.1 — до 3 лет; ч.3 (тяжкие) — вплоть до 10 лет"],
+["207.1","Публичное распространение заведомо ложной информации (фейки)","Безопасность","ч.1 — штраф; вплоть до 10 лет (ч.3)"],
+["208","Организация незаконного вооружённого формирования","Безопасность","ч.1 — от 10 до 20 лет"],
+["209","Бандитизм","Безопасность","ч.1 — от 10 до 15 лет; ч.2 — от 12 до 20 лет"],
+["210","Организация преступного сообщества","Безопасность","ч.1 — от 12 до 20 лет; ч.2 (участие) — от 7 до 10 лет"],
+["210.1","Занятие высшего положения в преступной иерархии","Безопасность","от 8 до 15 лет"],
+["211","Угон воздушного, водного судна или ж/д состава","Безопасность","ч.1 — от 5 до 10 лет; вплоть до пожизненного (ч.3)"],
+["212","Массовые беспорядки","Безопасность","ч.1 (организация) — от 8 до 15 лет; ч.2 (участие) — от 3 до 8 лет"],
+["213","Хулиганство","Безопасность","ч.1 — до 5 лет; ч.3 (с оружием) — от 5 до 8 лет"],
+["214","Вандализм","Безопасность","ч.1 — штраф, арест; ч.2 (группа) — вплоть до 3 лет"],
+["219","Нарушение требований пожарной безопасности","Здоровье","ч.1 — штраф; ч.2 (смерть) — вплоть до 5 лет; ч.3 — вплоть до 7 лет"],
+["228","Незаконные приобретение, хранение наркотических средств","Здоровье","ч.1 — до 3 лет; ч.2 — от 3 до 10 лет; ч.3 — от 10 до 15 лет; ч.4 — от 15 до 20 лет"],
+["228.1","Незаконные производство и сбыт наркотических средств","Здоровье","ч.1 — от 4 до 8 лет; вплоть до пожизненного (ч.5)"],
+["229","Хищение либо вымогательство наркотических средств","Здоровье","ч.1 — от 3 до 7 лет; ч.2 — от 6 до 10 лет; вплоть до пожизненного (ч.4)"],
+["230","Склонение к потреблению наркотических средств","Здоровье","ч.1 — от 3 до 5 лет; вплоть до 15 лет (ч.3)"],
+["231","Незаконное культивирование растений с наркотическими веществами","Здоровье","ч.1 — до 2 лет; ч.2 — вплоть до 8 лет"],
+["232","Организация притона для потребления наркотиков","Здоровье","ч.1 — до 4 лет; ч.2 — от 3 до 7 лет"],
+["233","Незаконная выдача рецептов на наркотики","Здоровье","до 3 лет лишения свободы"],
+["234","Незаконный оборот сильнодействующих веществ","Здоровье","ч.1 — до 8 лет"],
+["235","Незаконное осуществление медицинской деятельности","Здоровье","ч.1 — до 3 лет"],
+["236","Нарушение санитарно-эпидемиологических правил","Здоровье","ч.1 — до 2 лет; ч.2 (смерть) — от 3 до 5 лет"],
+["238","Производство и сбыт товаров, не отвечающих требованиям безопасности","Здоровье","ч.1 — до 2 лет; вплоть до 10 лет (ч.3)"],
+["240","Вовлечение в занятие проституцией","Здоровье","ч.1 — до 3 лет; ч.2 — до 6 лет"],
+["241","Организация занятия проституцией","Здоровье","ч.1 — штраф (100–500 тыс. руб.); ч.2 — вплоть до 6 лет"],
+["242","Незаконное распространение порнографии","Здоровье","ч.1 — до 2 лет"],
+["242.1","Порнографические изображения несовершеннолетних","Здоровье","ч.1 — от 3 до 8 лет"],
+["243","Уничтожение или повреждение памятников культуры","Здоровье","ч.1 — штраф, принудработы; ч.2 — до 6 лет"],
+["244","Надругательство над телами умерших и местами захоронения","Здоровье","ч.1 — штраф; ч.2 (группа) — вплоть до 5 лет"],
+["245","Жестокое обращение с животными","Здоровье","ч.1 — штраф, арест; ч.2 — до 5 лет"],
+["250","Загрязнение вод","Экология","ч.1 — штраф; ч.2 (вред здоровью) — до 5 лет"],
+["251","Загрязнение атмосферы","Экология","ч.1 — штраф; ч.2 (вред здоровью) — до 5 лет"],
+["254","Порча земли","Экология","ч.1 — штраф; ч.3 (тяжкие) — до 5 лет"],
+["256","Незаконная добыча (вылов) водных биоресурсов","Экология","ч.1 — до 2 лет"],
+["258","Незаконная охота","Экология","ч.1 — штраф, арест"],
+["260","Незаконная рубка лесных насаждений","Экология","ч.1 — штраф; ч.3 — штраф до 1 млн руб. или лишение свободы"],
+["261","Уничтожение или повреждение лесов (поджог леса)","Экология","ч.1 — до 3 лет; ч.3 — от 5 до 8 лет"],
+["263","Нарушение правил безопасности ж/д, воздушного и водного транспорта","Транспорт","ч.1 — штраф; при гибели людей — вплоть до 7 лет"],
+["264","Нарушение ПДД лицом, управляющим ТС (в опьянении)","Транспорт","ч.1 (тяжкий вред) — вплоть до 3 лет ограничения свободы; ч.2 (смерть) — от 2 до 7 лет; ч.3 — от 5 до 12 лет"],
+["264.1","Повторное управление ТС в опьянении или отказ от освидетельствования","Транспорт","ч.1 — вплоть до 2 лет; ч.2 (смерть) — от 2 до 7 лет"],
+["266","Обеспечение безопасности движения (путей, мостов, ТС)","Транспорт","ч.1 — штраф; ч.2 (смерть) — вплоть до 5 лет"],
+["267","Приведение в негодность транспортных средств","Транспорт","ч.1 — до 2 лет; при гибели людей — вплоть до 7 лет"]
+];
+const DATA3 = [
+["272","Неправомерный доступ к компьютерной информации","Гос. строй","ч.1 — до 2 лет; ч.4 (тяжкие) — вплоть до 7 лет"],
+["273","Создание и распространение вредоносных программ (вирусов)","Гос. строй","ч.1 — до 4 лет"],
+["275","Государственная измена","Гос. строй","от 12 до 20 лет лишения свободы"],
+["276","Шпионаж","Гос. строй","от 10 до 20 лет"],
+["277","Посягательство на жизнь государственного деятеля","Гос. строй","от 12 до 20 лет или пожизненное"],
+["278","Насильственный захват власти","Гос. строй","от 12 до 20 лет"],
+["279","Вооружённый мятеж","Гос. строй","от 15 до 20 лет"],
+["280","Публичные призывы к экстремистской деятельности","Гос. строй","ч.1 — до 5 лет"],
+["281","Диверсия","Гос. строй","ч.1 — от 12 до 20 лет; вплоть до пожизненного (ч.3)"],
+["282","Возбуждение ненависти либо вражды","Гос. строй","ч.1 — до 5 лет; ч.2 — до 6 лет"],
+["282.1","Организация экстремистского сообщества","Гос. строй","ч.1 — до 10 лет"],
+["282.2","Организация деятельности экстремистской организации","Гос. строй","ч.1 — до 10 лет; ч.1.1 (участие) — до 6 лет"],
+["283","Разглашение государственной тайны","Гос. строй","ч.1 — до 4 лет; ч.2 (тяжкие) — от 3 до 7 лет"],
+["284","Утрата документов с государственной тайной","Гос. строй","до 3 лет лишения свободы"],
+["294","Воспрепятствование осуществлению правосудия","Правосудие","ч.1 — до 2 лет"],
+["295","Посягательство на жизнь лица, осуществляющего правосудие","Правосудие","от 12 до 20 лет или пожизненное"],
+["296","Угроза в связи с осуществлением правосудия","Правосудие","ч.1 — до 2 лет"],
+["297","Неуважение к суду","Правосудие","ч.1 — штраф"],
+["299","Привлечение заведомо невиновного к уголовной ответственности","Правосудие","ч.1 — до 7 лет; ч.2 (тяжкое обвинение) — от 5 до 10 лет"],
+["301","Незаконное задержание или заключение под стражу","Правосудие","ч.1 — до 2 лет; ч.2 (тяжкие) — от 3 до 8 лет"],
+["302","Принуждение к даче показаний","Правосудие","ч.1 — до 3 лет; ч.2 (насилие, смерть) — от 2 до 8 лет"],
+["303","Фальсификация доказательств","Правосудие","ч.1 — штраф; ч.4 (тяжкие) — вплоть до 7 лет"],
+["305","Вынесение заведомо неправосудного приговора","Правосудие","ч.1 — штраф до 300 тыс. руб.; ч.2 (тяжкие) — от 3 до 10 лет"],
+["306","Заведомо ложный донос","Правосудие","ч.1 — до 2 лет; ч.2 (тяжкое обвинение) — до 6 лет"],
+["307","Заведомо ложные показания, заключение эксперта","Правосудие","ч.1 — штраф, принудработы; ч.2 (тяжкое обвинение) — до 5 лет"],
+["308","Отказ свидетеля от дачи показаний","Правосудие","штраф, арест до 3 мес."],
+["309","Подкуп или принуждение к даче показаний","Правосудие","ч.1 — штраф"],
+["310","Разглашение данных предварительного расследования","Правосудие","ч.1 — штраф; ч.2 (тяжкие) — до 4 лет"],
+["312","Незаконные действия с арестованным имуществом","Правосудие","ч.1 — до 2 лет"],
+["313","Побег из места лишения свободы или из-под стражи","Правосудие","ч.1 — до 4 лет; ч.2 (группа, насилие) — вплоть до 8 лет"],
+["314","Уклонение от отбывания лишения свободы","Правосудие","ч.1 — до 2 лет"],
+["315","Неисполнение приговора суда или судебного акта","Правосудие","до 2 лет лишения свободы"],
+["316","Укрывательство особо тяжких преступлений","Правосудие","ч.1 — до 2 лет"],
+["317","Посягательство на жизнь сотрудника правоохранительного органа","Управление","от 12 до 20 лет"],
+["318","Применение насилия в отношении представителя власти","Управление","ч.1 — до 5 лет; ч.2 — до 10 лет"],
+["319","Оскорбление представителя власти","Управление","штраф, обязательные работы"],
+["321","Дезорганизация деятельности СИЗО и исправительных учреждений","Управление","ч.1 — до 5 лет; ч.2 (насилие) — вплоть до 10 лет"],
+["322","Незаконное пересечение Государственной границы РФ","Управление","ч.1 — до 2 лет; ч.2 (группа, подложные документы) — вплоть до 4 лет"],
+["322.1","Организация незаконной миграции","Управление","ч.1 — до 5 лет"],
+["325","Похищение или повреждение документов, штампов, печатей","Управление","ч.1 — до 1 года"],
+["326","Подделка или уничтожение идентификационного номера ТС","Управление","ч.1 — до 1 года"],
+["327","Подделка документов, штампов, печатей","Управление","ч.1 — до 2 лет; ч.3 (использование) — штраф, арест"],
+["328","Уклонение от призыва на военную службу","Управление","до 2 лет лишения свободы"],
+["329","Надругательство над Государственным гербом или флагом РФ","Управление","до 1 года"],
+["330","Самоуправство","Управление","ч.1 — штраф, арест; ч.2 (тяжкие) — до 5 лет"],
+["335","Нарушение уставных правил взаимоотношений между военнослужащими","Воинские","ч.1 — до 3 лет"],
+["337","Самовольное оставление части или места службы","Воинские","ч.1 — арест до 6 мес.; ч.4 — до 5 лет"],
+["338","Дезертирство","Воинские","ч.1 — до 7 лет; ч.2 (с оружием, группа) — от 3 до 10 лет"],
+["339","Уклонение от военной службы путём симуляции болезни","Воинские","ч.2 — до 7 лет"],
+["356","Жестокое обращение с военнопленными и гражданским населением","Мир","ч.1 — до 20 лет"],
+["358","Экоцид (массовое уничтожение природы)","Мир","от 12 до 20 лет"],
+["359","Наемничество","Мир","ч.1 (участие) — от 12 до 18 лет; ч.2 (вербовка, финансирование) — от 15 до 20 лет"],
+["360","Нападение на лиц и учреждения, пользующиеся международной защитой","Мир","ч.1 — от 7 до 12 лет"]
+];
+const ARTICLES = DATA.concat(DATA2, DATA3);
+const CATS = [...new Set(ARTICLES.map(a => a[2]))];
+</script>
+<script>
+"use strict";
+// ---------- состояние ----------
+const LS_KNOWN = "ukrf_known_v1", LS_STATS = "ukrf_stats_v1";
+let known = new Set(JSON.parse(localStorage.getItem(LS_KNOWN) || "[]"));
+let stats = JSON.parse(localStorage.getItem(LS_STATS) || '{"attempts":0,"best":0}');
+let curCat = "Все", curCatCards = "Все", quiz = null, deck = [], deckIdx = 0;
+
+const $ = id => document.getElementById(id);
+const save = () => {
+  localStorage.setItem(LS_KNOWN, JSON.stringify([...known]));
+  localStorage.setItem(LS_STATS, JSON.stringify(stats));
+};
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const shuffle = a => { a = a.slice(); for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const byNum = Object.fromEntries(ARTICLES.map(a => [a[0], a]));
+
+// ---------- вкладки ----------
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll("section").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  $("tab-" + b.dataset.tab).classList.add("active");
+  if (b.dataset.tab === "stats") renderStats();
+}));
+
+// ---------- общие чипсы категорий ----------
+function chipsHTML(active) {
+  const counts = {};
+  ARTICLES.forEach(a => counts[a[2]] = (counts[a[2]] || 0) + 1);
+  let h = `<button class="chip ${active==="Все"?"active":""}" data-cat="Все">Все <small>${ARTICLES.length}</small></button>`;
+  for (const c of CATS) h += `<button class="chip ${active===c?"active":""}" data-cat="${c}">${c} <small>${counts[c]}</small></button>`;
+  return h;
+}
+function bindChips(id, set) {
+  $(id).addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    set(b.dataset.cat);
+  });
+}
+
+// ---------- режим «Учить» ----------
+function renderLearn() {
+  $("chipsLearn").innerHTML = chipsHTML(curCat);
+  const q = $("search").value.trim().toLowerCase();
+  const list = ARTICLES.filter(a =>
+    (curCat === "Все" || a[2] === curCat) &&
+    (!q || a[0].toLowerCase().includes(q) || a[1].toLowerCase().includes(q))
+  );
+  $("learnCount").textContent = `Статей: ${list.length}${q ? ` (по запросу «${q}»)` : ""}`;
+  $("alist").innerHTML = list.length ? list.map(a => `
+    <div class="acard">
+      <button class="star ${known.has(a[0])?"on":""}" data-n="${a[0]}" title="Выучено">★</button>
+      <div class="top"><span class="num">ст. ${a[0]}</span></div>
+      <h3>${esc(a[1])}</h3>
+      <div class="pun"><span class="pun-label">Наказание</span>${esc(a[3])}</div>
+      <span class="cat">${a[2]}</span>
+    </div>`).join("") : `<div class="empty">Ничего не найдено</div>`;
+}
+$("search").addEventListener("input", renderLearn);
+bindChips("chipsLearn", c => { curCat = c; renderLearn(); });
+$("alist").addEventListener("click", e => {
+  const s = e.target.closest(".star"); if (!s) return;
+  const n = s.dataset.n;
+  if (known.has(n)) { known.delete(n); s.classList.remove("on"); }
+  else { known.add(n); s.classList.add("on"); }
+  save();
+});
+
+// ---------- режим «Карточки» ----------
+function renderCards() {
+  $("chipsCards").innerHTML = chipsHTML(curCatCards);
+  if (!deck.length || deckIdx >= deck.length) {
+    if (deck.length) { deck = []; $("fcwrap").innerHTML = `<div class="result">
+      <svg class="bigicon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.3 2.3 4.9-5"/></svg>
+      <p>Колода пройдена</p>
+      <button class="btn" onclick="startDeck()">Пройти снова</button></div>`; return; }
+    const n = ARTICLES.filter(a => curCatCards === "Все" || a[2] === curCatCards).length;
+    $("fcwrap").innerHTML = `<div class="result"><p>${n} карточек</p>
+      <button class="btn" onclick="startDeck()">Начать</button></div>`;
+    return;
+  }
+  const a = deck[deckIdx];
+  $("fcwrap").innerHTML = `
+    <div class="fc" id="fc">
+      <div class="fc-inner">
+        <div class="face"><div class="small">статья ук рф</div><div class="bignum">${a[0]}</div>
+          <div class="cat">${a[2]}</div></div>
+        <div class="face back"><div class="small">ст. ${a[0]}</div><h3>${esc(a[1])}</h3>
+          <div class="pun"><span class="pun-label">Наказание</span>${esc(a[3])}</div></div>
+      </div>
+    </div>
+    <div class="fbtns">
+      <button class="btn" id="fcBtn">Проверить</button>
+      <button class="btn ghost" onclick="endDeck()">Завершить</button>
+    </div>
+    <div class="prog">Карточка ${deckIdx+1} из ${deck.length}
+      <div class="bar"><i style="width:${(deckIdx/deck.length*100).toFixed(0)}%"></i></div>
+    </div>`;
+  $("fcBtn").addEventListener("click", fcReveal);
+}
+function startDeck() {
+  const pool = ARTICLES.filter(a => curCatCards === "Все" || a[2] === curCatCards);
+  deck = shuffle(pool); deckIdx = 0; renderCards();
+}
+function fcReveal() {
+  $("fc").classList.add("flipped");
+  const b = $("fcBtn");
+  b.textContent = "Дальше →";
+  b.removeEventListener("click", fcReveal);
+  b.addEventListener("click", fcNext);
+}
+function fcNext() { deckIdx++; renderCards(); }
+function endDeck() { deck = []; deckIdx = 0; renderCards(); }
+bindChips("chipsCards", c => { curCatCards = c; deck = []; renderCards(); });
+
+// ---------- режим «Тест» ----------
+function startQuiz() {
+  quiz = { qs: shuffle(ARTICLES).slice(0, 10).map(a => makeQ(a)), i: 0, right: 0, mistakes: [] };
+  renderQ();
+}
+function makeQ(a) {
+  const type = Math.floor(Math.random() * 3);
+  let qText, right, opts;
+  const others = shuffle(ARTICLES.filter(x => x[0] !== a[0]));
+  const pick = n => { const out = []; const used = new Set();
+    for (const o of others) { const v = o[type === 2 ? 3 : (type === 0 ? 1 : 0)];
+      if (!used.has(v)) { out.push(o); used.add(v); } if (out.length === n) break; }
+    return out; };
+  if (type === 0) { qText = `Что такое ст. ${a[0]} УК РФ?`; right = a[1];
+    opts = shuffle([right, ...pick(3).map(o => o[1])]); }
+  else if (type === 1) { qText = `Статья УК РФ «${a[1]}» — это статья…`; right = a[0];
+    opts = shuffle([right, ...pick(3).map(o => o[0])]); }
+  else { qText = `Какое наказание (кратко) предусмотрено ст. ${a[0]} УК РФ «${a[1]}»?`; right = a[3];
+    opts = shuffle([right, ...pick(3).map(o => o[3])]); }
+  return { qText, right, opts, answered: false };
+}
+function renderQ() {
+  if (quiz.i >= quiz.qs.length) return renderResult();
+  const q = quiz.qs[quiz.i];
+  $("quizArea").innerHTML = `
+    <div class="qbox">
+      <div class="qmeta"><span>Вопрос ${quiz.i+1} / ${quiz.qs.length}</span><span>Верно: ${quiz.right}</span></div>
+      <div class="bar"><i style="width:${(quiz.i/quiz.qs.length*100).toFixed(0)}%"></i></div>
+      <h2 style="margin-top:14px">${esc(q.qText)}</h2>
+      ${q.opts.map((o,i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}
+      <div class="center" id="quitWrap" style="margin-top:6px"><button class="btn ghost" onclick="endQuiz()">Завершить</button></div>
+    </div>`;
+  $("quizArea").querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => answer(b)));
+}
+function answer(btn) {
+  const q = quiz.qs[quiz.i];
+  const chosen = q.opts[+btn.dataset.i];
+  const isRight = chosen === q.right;
+  $("quizArea").querySelectorAll(".opt").forEach(b => {
+    b.disabled = true;
+    if (q.opts[+b.dataset.i] === q.right) b.classList.add("correct");
+  });
+  if (!isRight) { btn.classList.add("wrong"); quiz.mistakes.push(q); }
+  else quiz.right++;
+  quiz.answered = true;
+  const box = $("quizArea").querySelector(".qbox");
+  const nx = document.createElement("button");
+  nx.className = "btn"; nx.style.cssText = "display:block; margin:10px auto 0";
+  nx.textContent = quiz.i === quiz.qs.length - 1 ? "Результат →" : "Следующий вопрос →";
+  nx.onclick = () => { quiz.i++; renderQ(); };
+  box.insertBefore(nx, document.getElementById("quitWrap"));
+}
+function renderResult() {
+  stats.attempts++;
+  if (quiz.right > stats.best) stats.best = quiz.right;
+  save();
+  const pct = Math.round(quiz.right / quiz.qs.length * 100);
+  const msg = pct === 100 ? "Идеально!" : pct >= 70 ? "Хороший результат!" : pct >= 40 ? "Неплохо, но есть над чем поработать" : "Повторите статьи — и снова!";
+  $("quizArea").innerHTML = `<div class="result">
+    <div class="big">${quiz.right} / ${quiz.qs.length}</div>
+    <p>${msg} Лучший результат: ${stats.best} из 10.</p>
+    ${quiz.mistakes.length ? `<div class="mist"><b>Разбор ошибок:</b><ul>${quiz.mistakes.map(q =>
+      `<li>${esc(q.qText)}<br>Верный ответ: <b>${esc(q.right)}</b></li>`).join("")}</ul></div>` : ""}
+    <br><button class="btn" onclick="startQuiz()">Пройти заново</button>
+    <button class="btn ghost" onclick="quizHome()">На главный экран</button>
+  </div>`;
+}
+function endQuiz() { quiz = null; quizHome(); }
+function quizHome() {
+  $("quizArea").innerHTML = `<div class="result">
+    <p>Лучший результат: <b>${stats.best}</b> из 10 · попыток: ${stats.attempts}</p>
+    <button class="btn" onclick="startQuiz()">Начать тест</button></div>`;
+}
+quizHome();
+
+// ---------- статистика ----------
+function renderStats() {
+  const counts = {}, kn = {};
+  ARTICLES.forEach(a => { counts[a[2]] = (counts[a[2]] || 0) + 1; if (known.has(a[0])) kn[a[2]] = (kn[a[2]] || 0) + 1; });
+  const pct = Math.round(known.size / ARTICLES.length * 100);
+  $("statsArea").innerHTML = `
+    <div class="sgrid">
+      <div class="stat"><div class="v">${ARTICLES.length}</div><div class="l">статей в тренажёре</div></div>
+      <div class="stat"><div class="v">${known.size}</div><div class="l">отмечено выученными ★</div></div>
+      <div class="stat"><div class="v">${stats.attempts}</div><div class="l">тестов пройдено</div></div>
+      <div class="stat"><div class="v">${stats.best}/10</div><div class="l">лучший результат теста</div></div>
+    </div>
+    <p class="hint" style="text-align:center">Общий прогресс: ${pct}%</p>
+    <div class="bar" style="max-width:420px; margin:0 auto 20px"><i style="width:${pct}%"></i></div>
+    ${CATS.map(c => { const p = Math.round((kn[c]||0) / counts[c] * 100);
+      return `<div class="prow"><span class="name">${c}</span>
+        <div class="bar"><i style="width:${p}%"></i></div><span class="pc">${kn[c]||0}/${counts[c]}</span></div>`; }).join("")}
+    <p class="center" style="margin-top:22px"><button class="btn ghost" id="resetBtn">Сбросить прогресс</button></p>`;
+  $("resetBtn").onclick = () => {
+    if (confirm("Точно сбросить весь прогресс (★ и результаты тестов)?")) {
+      known = new Set(); stats = { attempts: 0, best: 0 }; save(); renderStats();
+    }
+  };
+}
+
+// ---------- старт ----------
+renderLearn();
+renderCards();
+</script>
+</body>
+</html>
